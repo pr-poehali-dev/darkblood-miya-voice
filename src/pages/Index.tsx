@@ -486,17 +486,73 @@ export default function Index() {
         </div>
       </header>
 
-      {/* HERO STRIP */}
-      <div className="relative z-20 border-b" style={{ borderColor: '#ff003310', background: 'rgba(8,0,0,0.6)', padding: '20px 0' }}>
-        <div className="max-w-7xl mx-auto px-6">
-          <div style={{ fontFamily: 'Share Tech Mono', fontSize: '9px', color: '#333', letterSpacing: '0.25em', marginBottom: 8 }}>
-            ОПЕРАТИВНАЯ СВОДКА
+      {/* HERO STRIP — Мия Гаусс */}
+      <div className="relative z-20 border-b" style={{ borderColor: '#ff003318', background: 'rgba(6,0,0,0.85)', overflow: 'hidden' }}>
+        {/* Фоновые линии сетки */}
+        <div style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
+          backgroundImage: 'linear-gradient(rgba(255,0,51,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,0,51,0.04) 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+        }} />
+
+        <div className="max-w-7xl mx-auto px-6 py-0 flex items-end gap-8 relative z-10" style={{ minHeight: 220 }}>
+
+          {/* Пиксельная Мия */}
+          <div style={{ position: 'relative', flexShrink: 0, marginBottom: 0 }}>
+            {/* Пиксельный эффект через CSS filter */}
+            <div style={{
+              position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
+              background: 'linear-gradient(to top, rgba(6,0,0,0.9) 0%, transparent 30%)',
+            }} />
+            {/* Неоновое свечение под персонажем */}
+            <div style={{
+              position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)',
+              width: 120, height: 30,
+              background: 'radial-gradient(ellipse, rgba(255,0,51,0.35) 0%, transparent 70%)',
+              filter: 'blur(8px)',
+              zIndex: 1,
+            }} />
+            <img
+              src="https://cdn.poehali.dev/projects/17187a45-9c23-44ca-8a1b-825bcda16b4a/files/d88a84d0-fba7-45aa-bc9a-9199d071ee47.jpg"
+              alt="Mia Gauss"
+              style={{
+                height: 210,
+                width: 'auto',
+                imageRendering: 'pixelated',
+                filter: 'contrast(1.15) saturate(0.7) brightness(0.9) drop-shadow(0 0 12px rgba(255,0,51,0.5)) drop-shadow(0 0 24px rgba(255,0,51,0.2))',
+                position: 'relative',
+                zIndex: 3,
+                display: 'block',
+              }}
+            />
           </div>
-          <p style={{ fontFamily: 'Share Tech Mono', fontSize: '12px', color: '#666', maxWidth: 680, lineHeight: 1.7 }}>
-            Я — <span className="neon-red" style={{ fontWeight: 600 }}>Мия Гаусс</span>.
-            Я собираю то, о чём не говорят в новостях.{' '}
-            <span style={{ color: '#ff003366' }}>Наведи курсор на событие</span> — и я расскажу тебе то, чего нет в официальных отчётах.
-          </p>
+
+          {/* Текст рядом с Мией */}
+          <div style={{ paddingBottom: 24, flex: 1 }}>
+            <div style={{ fontFamily: 'Share Tech Mono', fontSize: '8px', color: '#333', letterSpacing: '0.3em', marginBottom: 10 }}>
+              ▶ ИДЕНТИФИКАЦИЯ // СУБЪЕКТ_001
+            </div>
+            <div style={{ fontFamily: 'Orbitron, monospace', fontSize: '13px', fontWeight: 700, color: '#ff0033', letterSpacing: '0.2em', marginBottom: 6, textShadow: '0 0 12px #ff0033' }}>
+              МИЯ ГАУСС
+            </div>
+            <div style={{ fontFamily: 'Share Tech Mono', fontSize: '9px', color: '#444', letterSpacing: '0.15em', marginBottom: 14, lineHeight: 1.8 }}>
+              ВОЗРАСТ: 18 · СТАТУС: АКТИВНА · ДОСТУП: УРОВЕНЬ_Ω
+            </div>
+            <p style={{ fontFamily: 'Share Tech Mono', fontSize: '11px', color: '#555', maxWidth: 520, lineHeight: 1.8, margin: 0 }}>
+              Я собираю то, о чём не говорят в новостях.{' '}
+              <span style={{ color: '#ff003355' }}>Каждый файл в этом архиве</span> — задокументированное событие.
+              Факты. Цифры. Ничего лишнего.{' '}
+              <span style={{ color: '#ff003380' }}>Наведи курсор на событие</span> — и я расскажу тебе то, чего нет в официальных отчётах.
+            </p>
+            {/* Терминальная строка */}
+            <div style={{
+              marginTop: 16,
+              fontFamily: 'Share Tech Mono', fontSize: '10px',
+              color: '#00ff4166', letterSpacing: '0.1em',
+            }}>
+              <span className="terminal-cursor">_</span>
+            </div>
+          </div>
         </div>
       </div>
 
