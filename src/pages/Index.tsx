@@ -2,37 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import Icon from '@/components/ui/icon';
 import { useHorrorAudio } from '@/hooks/useHorrorAudio';
 
-function useMiaVoice() {
-  const speakRef = useRef<SpeechSynthesisUtterance | null>(null);
-
-  const speak = (text: string) => {
-    if (!window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = 'ru-RU';
-    utter.rate = 0.82;
-    utter.pitch = 1.35;
-    utter.volume = 0.9;
-
-    // Подбираем женский голос
-    const voices = window.speechSynthesis.getVoices();
-    const femaleRu = voices.find(v =>
-      v.lang.startsWith('ru') && (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('женский') || v.name.includes('Milena') || v.name.includes('Irina') || v.name.includes('Anna') || v.name.includes('Victoria') || v.name.includes('Oksana'))
-    ) || voices.find(v => v.lang.startsWith('ru')) || null;
-
-    if (femaleRu) utter.voice = femaleRu;
-    speakRef.current = utter;
-    window.speechSynthesis.speak(utter);
-  };
-
-  const stop = () => {
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
-  };
-
-  useEffect(() => () => { stop(); }, []);
-  return { speak, stop };
-}
-
 const ARCHIVE_DATA = [
   {
     id: 1,
@@ -44,7 +13,7 @@ const ARCHIVE_DATA = [
     severity: 'КРИТИЧНО',
     casualties: 34,
     verified: true,
-    miaVoice: 'Я была в Вене через три дня после взрыва. Запах горелого пластика до сих пор стоит в памяти. Власти назвали это "изолированным инцидентом". Ложь. Я видела оцепление в двух кварталах — там нашли второе устройство, о котором не сообщали.',
+    miaVoice: 'Я была в Вене через три дня после взрыва. Власти назвали это изолированным инцидентом. Ложь. Я видела оцепление в двух кварталах — там нашли второе устройство, о котором не сообщали.',
   },
   {
     id: 2,
@@ -56,7 +25,7 @@ const ARCHIVE_DATA = [
     severity: 'ВЫСОКИЙ',
     casualties: 19,
     verified: true,
-    miaVoice: 'Японские СМИ показали размытые кадры. Я получила оригиналы. Нападавший стоял неподвижно 40 секунд перед первым выстрелом — как будто ждал команды. Его телефон был уничтожен прямо в камере полиции. Кем? Никто не ответил.',
+    miaVoice: 'Нападавший стоял неподвижно 40 секунд перед первым выстрелом — как будто ждал команды. Его телефон уничтожили прямо в камере полиции.',
   },
   {
     id: 3,
@@ -68,7 +37,7 @@ const ARCHIVE_DATA = [
     severity: 'ВЫСОКИЙ',
     casualties: 3,
     verified: false,
-    miaVoice: 'Официально — психически нестабильный одиночка. Неофициально — человек с дипломатическим паспортом, которого вычеркнули из всех баз данных за 72 часа до инцидента. Заложники до сих пор не дают интервью. Им запрещено.',
+    miaVoice: 'Официально — психически нестабильный одиночка. Неофициально — человек с дипломатическим паспортом, вычеркнутый из всех баз данных за 72 часа до инцидента.',
   },
   {
     id: 4,
@@ -80,31 +49,31 @@ const ARCHIVE_DATA = [
     severity: 'КРИТИЧНО',
     casualties: 71,
     verified: true,
-    miaVoice: '71 человек. Я читала каждое имя. Двенадцатиминутный интервал — это не случайность, это почерк. Я видела этот же интервал в трёх других атаках за последние два года. Никто не собирает эту статистику. Кроме меня.',
+    miaVoice: '71 человек. Двенадцатиминутный интервал — это почерк. Я видела этот же интервал в трёх других атаках за два года. Никто не собирает эту статистику. Кроме меня.',
   },
   {
     id: 5,
-    date: '2024-03-18',
-    region: 'Африка',
-    category: 'Нападение',
-    title: 'НАЙРОБИ: АТАКА НА ПОСОЛЬСТВО',
-    desc: 'Организованная группа пробила внешнюю охрану. Дипперсонал эвакуирован.',
-    severity: 'СРЕДНИЙ',
-    casualties: 8,
+    date: '2024-03-22',
+    region: 'Россия',
+    category: 'Стрельба',
+    title: 'МОСКВА: ТЕРАКТ В «КРОКУС СИТИ ХОЛЛ»',
+    desc: 'Вооружённые нападавшие открыли огонь по зрителям. Пожар охватил здание. 145 погибших.',
+    severity: 'КРИТИЧНО',
+    casualties: 145,
     verified: true,
-    miaVoice: 'Восемь охранников погибли. Их имён нет в официальном отчёте — только "персонал местного найма". Я нашла их семьи. Никто не получил компенсации. Посольство работает в штатном режиме. Мир продолжается.',
+    miaVoice: 'Самый смертоносный теракт в России за два десятилетия. Четверо нападавших действовали слаженно. Вопрос о возможной халатности спецслужб так и не получил официального ответа.',
   },
   {
     id: 6,
-    date: '2024-01-07',
-    region: 'Европа',
-    category: 'Стрельба',
-    title: 'ПАРИЖ: РАССТРЕЛ РЕДАКЦИИ',
-    desc: 'Целенаправленное уничтожение. Трое журналистов. Нападавшие ушли незамеченными.',
-    severity: 'ВЫСОКИЙ',
-    casualties: 3,
+    date: '2024-01-03',
+    region: 'Ближний Восток',
+    category: 'Взрыв',
+    title: 'КЕРМАН: ДВОЙНОЙ ВЗРЫВ НА ПОХОРОНАХ',
+    desc: 'Два смертника подорвались в толпе на траурной церемонии. 84 погибших.',
+    severity: 'КРИТИЧНО',
+    casualties: 84,
     verified: true,
-    miaVoice: 'Они публиковали то, что публикую я. Меня предупреждали — это может стать предупреждением и мне. Я не остановилась. Если вы читаете этот архив и меня больше нет — значит, я оказалась права.',
+    miaVoice: 'Люди пришли проститься — и попали в ловушку. Второй взрыв произошёл когда подбежали помочь после первого. Это хладнокровный расчёт.',
   },
   {
     id: 7,
@@ -116,25 +85,121 @@ const ARCHIVE_DATA = [
     severity: 'КРИТИЧНО',
     casualties: 47,
     verified: true,
-    miaVoice: 'Ему было, предположительно, 17 лет. Я смотрела на фотографию долго. Он не выглядел как монстр. Кто превратил его в оружие — вот настоящий вопрос. Ответа нет. Его, возможно, никогда не будет.',
+    miaVoice: 'Ему было примерно 17 лет. Он не выглядел как монстр на фотографии. Кто превратил его в оружие — вот настоящий вопрос.',
   },
   {
     id: 8,
-    date: '2023-10-14',
+    date: '2023-10-07',
+    region: 'Ближний Восток',
+    category: 'Нападение',
+    title: 'ИЗРАИЛЬ: АТАКА НА КИБУЦЫ',
+    desc: 'Массированное нападение с прорывом границы. Захват заложников. Свыше 1200 погибших.',
+    severity: 'КРИТИЧНО',
+    casualties: 1200,
+    verified: true,
+    miaVoice: 'Крупнейшая атака на мирное население в истории Израиля. Масштаб координации указывает на многолетнюю подготовку. Мировое сообщество ответило по-разному — и это само по себе говорит о многом.',
+  },
+  {
+    id: 9,
+    date: '2023-09-10',
+    region: 'Россия',
+    category: 'Взрыв',
+    title: 'СЕВАСТОПОЛЬ: УДАР ПО ПЛОЩАДИ НАХИМОВА',
+    desc: 'Взрывы в центре города в День города. 122 пострадавших, в том числе дети.',
+    severity: 'КРИТИЧНО',
+    casualties: 122,
+    verified: true,
+    miaVoice: 'Праздничный день. Семьи с детьми на набережной. В официальных сводках — минимум деталей. Я собирала свидетельства очевидцев напрямую.',
+  },
+  {
+    id: 10,
+    date: '2023-07-30',
+    region: 'Россия',
+    category: 'Взрыв',
+    title: 'МОСКВА: АТАКА БЕСПИЛОТНИКОВ НА ДЕЛОВОЙ ЦЕНТР',
+    desc: 'Несколько БПЛА поразили здания в деловом районе столицы. Эвакуация тысяч человек.',
+    severity: 'ВЫСОКИЙ',
+    casualties: 3,
+    verified: true,
+    miaVoice: 'Дроны над Москвой — это изменение правил игры. Психологический эффект был рассчитан точно. Население почувствовало войну там, где её не ждали.',
+  },
+  {
+    id: 11,
+    date: '2023-04-15',
     region: 'Америка',
-    category: 'Захват',
-    title: 'МЕХИКО: ЗАХВАТ В БАНКЕ',
-    desc: 'Четверо вооружённых. 18 часов переговоров. Связь с картелем не подтверждена.',
+    category: 'Взрыв',
+    title: 'БОСТОН: 10 ЛЕТ МАРАФОНСКОМУ ТЕРАКТУ',
+    desc: 'Памятная церемония омрачена угрозой повторной атаки. Оцепление, эвакуация. Угроза не подтвердилась.',
     severity: 'СРЕДНИЙ',
     casualties: 0,
-    verified: false,
-    miaVoice: 'Официально — ограбление. Но переговорщик прилетел на частном самолёте из Вашингтона. Ради ограбления банка? Что они хотели получить из этого здания — никто так и не сказал. Я до сих пор работаю над этим делом.',
+    verified: true,
+    miaVoice: 'Страх — тоже оружие. Они не взорвали ничего в этот день. Но тысячи людей разбежались. Иногда достаточно просто напомнить.',
+  },
+  {
+    id: 12,
+    date: '2022-12-25',
+    region: 'Америка',
+    category: 'Взрыв',
+    title: 'НЭШВИЛЛ: ВЗРЫВ ФУРГОНА В РОЖДЕСТВО',
+    desc: 'Заминированный фургон взорвался в центре города ранним утром. Предварительное предупреждение через громкоговоритель.',
+    severity: 'ВЫСОКИЙ',
+    casualties: 8,
+    verified: true,
+    miaVoice: 'Нападавший заблаговременно предупредил через запись. Он не хотел жертв — он хотел что-то сказать. Что именно — следствие так и не раскрыло полностью.',
+  },
+  {
+    id: 13,
+    date: '2024-01-07',
+    region: 'Европа',
+    category: 'Стрельба',
+    title: 'ПАРИЖ: РАССТРЕЛ РЕДАКЦИИ',
+    desc: 'Целенаправленное уничтожение. Трое журналистов. Нападавшие ушли незамеченными.',
+    severity: 'ВЫСОКИЙ',
+    casualties: 3,
+    verified: true,
+    miaVoice: 'Они публиковали то, что публикую я. Если вы читаете этот архив и меня больше нет — значит, я оказалась права.',
+  },
+  {
+    id: 14,
+    date: '2023-06-14',
+    region: 'Россия',
+    category: 'Нападение',
+    title: 'ДАГЕСТАН: НАПАДЕНИЕ НА ЦЕРКВИ И ПОСТ ДПС',
+    desc: 'Скоординированные атаки на православные церкви и синагогу. 20 погибших силовиков.',
+    severity: 'КРИТИЧНО',
+    casualties: 20,
+    verified: true,
+    miaVoice: 'Атаки одновременно на разные религиозные объекты. Цель — не просто убить, а разжечь. Это была попытка поджечь общество изнутри.',
+  },
+  {
+    id: 15,
+    date: '2023-03-27',
+    region: 'Америка',
+    category: 'Стрельба',
+    title: 'НЭШВИЛЛ: СТРЕЛЬБА В ХРИСТИАНСКОЙ ШКОЛЕ',
+    desc: 'Нападение на начальную школу. 6 погибших, в том числе трое детей.',
+    severity: 'КРИТИЧНО',
+    casualties: 6,
+    verified: true,
+    miaVoice: 'Трое детей. Я не могу писать об этом без дрожи. Манифест нападавшей засекречен властями до сих пор. Почему? Что в нём такого, что нельзя показать?',
+  },
+  {
+    id: 16,
+    date: '2024-03-18',
+    region: 'Африка',
+    category: 'Нападение',
+    title: 'НАЙРОБИ: АТАКА НА ПОСОЛЬСТВО',
+    desc: 'Организованная группа пробила внешнюю охрану. Дипперсонал эвакуирован.',
+    severity: 'СРЕДНИЙ',
+    casualties: 8,
+    verified: true,
+    miaVoice: 'Восемь охранников погибли. Их имён нет в официальном отчёте — только "персонал местного найма". Я нашла их семьи. Никто не получил компенсации.',
   },
 ];
 
-const REGIONS = ['Все', 'Европа', 'Азия', 'Америка', 'Ближний Восток', 'Африка'];
+const REGIONS = ['Все', 'Европа', 'Азия', 'Россия', 'Америка', 'Ближний Восток', 'Африка'];
 const CATEGORIES = ['Все', 'Взрыв', 'Стрельба', 'Захват', 'Нападение'];
-const YEARS = ['Все', '2024', '2023'];
+const YEARS = ['Все', '2024', '2023', '2022'];
 
 const SEVERITY_COLORS: Record<string, string> = {
   КРИТИЧНО: '#ff0033',
@@ -185,6 +250,55 @@ function MatrixRain() {
   );
 }
 
+// Кровавые следы пальцев/капли поверх логотипа
+function BloodOnTitle() {
+  const drops = [
+    { left: '2%',  delay: 0,    height: 38, width: 2,   opacity: 0.85 },
+    { left: '8%',  delay: 0.3,  height: 22, width: 1.5, opacity: 0.6  },
+    { left: '15%', delay: 0.7,  height: 50, width: 2.5, opacity: 0.9  },
+    { left: '23%', delay: 0.1,  height: 30, width: 1.5, opacity: 0.7  },
+    { left: '31%', delay: 0.5,  height: 44, width: 2,   opacity: 0.8  },
+    { left: '40%', delay: 0.9,  height: 18, width: 1,   opacity: 0.5  },
+    { left: '50%', delay: 0.2,  height: 55, width: 3,   opacity: 0.95 },
+    { left: '58%', delay: 0.6,  height: 28, width: 1.5, opacity: 0.65 },
+    { left: '67%', delay: 0.4,  height: 42, width: 2,   opacity: 0.8  },
+    { left: '75%', delay: 0.8,  height: 20, width: 1,   opacity: 0.55 },
+    { left: '83%', delay: 0.15, height: 48, width: 2.5, opacity: 0.88 },
+    { left: '91%', delay: 0.55, height: 33, width: 2,   opacity: 0.72 },
+    { left: '97%', delay: 0.35, height: 25, width: 1.5, opacity: 0.6  },
+  ];
+
+  return (
+    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', overflow: 'hidden', zIndex: 1 }}>
+      {drops.map((d, i) => (
+        <div key={i} style={{ position: 'absolute', left: d.left, top: 0 }}>
+          {/* Основная капля */}
+          <div style={{
+            width: `${d.width}px`,
+            height: `${d.height}px`,
+            background: `linear-gradient(to bottom, #cc0022, #8b0000 60%, #3a0008)`,
+            borderRadius: '0 0 50% 50%',
+            boxShadow: `0 0 4px rgba(200,0,34,0.6)`,
+            animationDelay: `${d.delay}s`,
+            opacity: d.opacity,
+          }} />
+          {/* Шарик на конце */}
+          <div style={{
+            width: `${d.width * 2.2}px`,
+            height: `${d.width * 2.2}px`,
+            borderRadius: '50%',
+            background: '#8b0000',
+            marginLeft: `-${d.width * 0.6}px`,
+            marginTop: '-1px',
+            opacity: d.opacity * 0.9,
+            boxShadow: '0 2px 6px rgba(139,0,0,0.7)',
+          }} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function MiaTooltip({ text, visible }: { text: string; visible: boolean }) {
   const [displayed, setDisplayed] = useState('');
   const [typing, setTyping] = useState(false);
@@ -204,12 +318,12 @@ function MiaTooltip({ text, visible }: { text: string; visible: boolean }) {
       if (i < text.length) {
         setDisplayed(text.slice(0, i + 1));
         i++;
-        timerRef.current = setTimeout(type, 22 + Math.random() * 18);
+        timerRef.current = setTimeout(type, 20 + Math.random() * 16);
       } else {
         setTyping(false);
       }
     };
-    timerRef.current = setTimeout(type, 120);
+    timerRef.current = setTimeout(type, 100);
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
@@ -218,47 +332,27 @@ function MiaTooltip({ text, visible }: { text: string; visible: boolean }) {
   if (!visible && displayed === '') return null;
 
   return (
-    <div
-      style={{
-        position: 'absolute',
-        bottom: 'calc(100% + 12px)',
-        left: 0,
-        right: 0,
-        background: 'rgba(4,0,0,0.97)',
-        border: '1px solid rgba(255,0,51,0.4)',
-        boxShadow: '0 0 24px rgba(255,0,51,0.15), inset 0 0 30px rgba(255,0,51,0.03)',
-        padding: '14px 16px',
-        zIndex: 100,
-        pointerEvents: 'none',
-      }}
-    >
-      {/* Угловые декоры */}
+    <div style={{
+      position: 'absolute',
+      bottom: 'calc(100% + 10px)',
+      left: 0, right: 0,
+      background: 'rgba(4,0,0,0.97)',
+      border: '1px solid rgba(255,0,51,0.4)',
+      boxShadow: '0 0 24px rgba(255,0,51,0.15), inset 0 0 30px rgba(255,0,51,0.03)',
+      padding: '14px 16px',
+      zIndex: 100,
+      pointerEvents: 'none',
+    }}>
       <div style={{ position: 'absolute', top: 0, left: 0, width: 12, height: 12, borderTop: '2px solid #ff0033', borderLeft: '2px solid #ff0033' }} />
       <div style={{ position: 'absolute', top: 0, right: 0, width: 12, height: 12, borderTop: '2px solid #ff0033', borderRight: '2px solid #ff0033' }} />
       <div style={{ position: 'absolute', bottom: 0, left: 0, width: 12, height: 12, borderBottom: '2px solid #ff0033', borderLeft: '2px solid #ff0033' }} />
       <div style={{ position: 'absolute', bottom: 0, right: 0, width: 12, height: 12, borderBottom: '2px solid #ff0033', borderRight: '2px solid #ff0033' }} />
-
-      <div style={{
-        fontFamily: 'Share Tech Mono, monospace',
-        fontSize: '9px',
-        color: '#ff0033',
-        letterSpacing: '0.2em',
-        marginBottom: 8,
-        opacity: 0.7,
-      }}>
+      <div style={{ fontFamily: 'Share Tech Mono', fontSize: '9px', color: '#ff0033', letterSpacing: '0.2em', marginBottom: 8, opacity: 0.7 }}>
         ▶ МИЯ ГАУСС / ЛИЧНЫЙ КОММЕНТАРИЙ
       </div>
-      <p style={{
-        fontFamily: 'Share Tech Mono, monospace',
-        fontSize: '11px',
-        color: '#c8c8c8',
-        lineHeight: 1.7,
-        margin: 0,
-      }}>
+      <p style={{ fontFamily: 'Share Tech Mono', fontSize: '11px', color: '#c8c8c8', lineHeight: 1.7, margin: 0 }}>
         {displayed}
-        {typing && (
-          <span style={{ animation: 'blink 0.7s step-end infinite', color: '#00ffe5' }}>█</span>
-        )}
+        {typing && <span style={{ animation: 'blink 0.7s step-end infinite', color: '#00ffe5' }}>█</span>}
       </p>
     </div>
   );
@@ -273,7 +367,6 @@ export default function Index() {
   const [booted, setBooted] = useState(false);
   const [bootText, setBootText] = useState('');
   useHorrorAudio();
-  const mia = useMiaVoice();
 
   const bootLines = [
     '> ИНИЦИАЛИЗАЦИЯ MIA_GAUSS.EXE...',
@@ -348,32 +441,34 @@ export default function Index() {
       <div className="noise-overlay" />
       <MatrixRain />
 
-      {/* Кровавые подтёки сверху */}
-      <div className="fixed top-0 left-0 w-full pointer-events-none z-10">
-        {[7, 14, 22, 33, 44, 56, 67, 79, 88, 95].map((left, i) => (
-          <div key={i} style={{
-            position: 'absolute', left: `${left}%`, top: 0,
-            width: '1px',
-            height: `${25 + (i * 7) % 45}px`,
-            background: 'linear-gradient(to bottom, #ff0033, #5a0010, transparent)',
-            opacity: 0.35 + (i % 3) * 0.12,
-          }} />
-        ))}
-      </div>
-
       {/* HEADER */}
-      <header className="relative z-20 border-b" style={{ borderColor: '#ff003318', background: 'rgba(6,0,0,0.96)', backdropFilter: 'blur(10px)' }}>
+      <header className="relative z-20 border-b" style={{ borderColor: '#ff003318', background: 'rgba(6,0,0,0.96)', backdropFilter: 'blur(10px)', overflow: 'visible' }}>
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div style={{ width: 3, height: 44, background: '#ff0033', boxShadow: '0 0 14px #ff0033' }} />
-            <div>
-              <h1 className="glitch-text" data-text="MIA GAUSS" style={{
-                fontFamily: 'Orbitron, monospace', fontSize: '22px', fontWeight: 900,
-                color: '#fff', letterSpacing: '0.22em', lineHeight: 1,
-              }}>
+            <div style={{ position: 'relative' }}>
+              {/* Кровь поверх заголовка */}
+              <div style={{ position: 'absolute', top: -4, left: 0, right: 0, height: '120%', pointerEvents: 'none', zIndex: 2 }}>
+                <BloodOnTitle />
+              </div>
+              <h1
+                className="glitch-text"
+                data-text="MIA GAUSS"
+                style={{
+                  fontFamily: 'Orbitron, monospace',
+                  fontSize: '26px',
+                  fontWeight: 900,
+                  color: '#fff',
+                  letterSpacing: '0.22em',
+                  lineHeight: 1,
+                  position: 'relative',
+                  zIndex: 3,
+                  textShadow: '0 0 20px rgba(255,0,51,0.4)',
+                }}
+              >
                 MIA GAUSS
               </h1>
-              <div style={{ fontFamily: 'Share Tech Mono', fontSize: '9px', color: '#ff0033', letterSpacing: '0.35em', marginTop: 3 }}>
+              <div style={{ fontFamily: 'Share Tech Mono', fontSize: '9px', color: '#ff0033', letterSpacing: '0.35em', marginTop: 4, position: 'relative', zIndex: 3 }}>
                 АРХИВ ГЛОБАЛЬНЫХ ИНЦИДЕНТОВ
               </div>
             </div>
@@ -399,7 +494,8 @@ export default function Index() {
           </div>
           <p style={{ fontFamily: 'Share Tech Mono', fontSize: '12px', color: '#666', maxWidth: 680, lineHeight: 1.7 }}>
             Я — <span className="neon-red" style={{ fontWeight: 600 }}>Мия Гаусс</span>.
-            Я собираю то, о чём не говорят в новостях. <span style={{ color: '#ff003388' }}>Наведи курсор на событие</span> — и я расскажу тебе то, чего нет в официальных отчётах.
+            Я собираю то, о чём не говорят в новостях.{' '}
+            <span style={{ color: '#ff003366' }}>Наведи курсор на событие</span> — и я расскажу тебе то, чего нет в официальных отчётах.
           </p>
         </div>
       </div>
@@ -410,7 +506,7 @@ export default function Index() {
           {[
             { label: 'ЗАПИСЕЙ', val: ARCHIVE_DATA.length, color: '#00ffe5' },
             { label: 'ПОКАЗАНО', val: filtered.length, color: '#fff' },
-            { label: 'ЖЕРТВ', val: totalCasualties, color: '#ff0033' },
+            { label: 'ЖЕРТВ', val: totalCasualties.toLocaleString('ru-RU'), color: '#ff0033' },
             { label: 'СТАТУС', val: 'ONLINE', color: '#00ff41' },
           ].map((s, i) => (
             <div key={i} style={{ padding: '10px 20px', borderRight: i < 3 ? '1px solid #0f0f0f' : 'none' }}>
@@ -431,7 +527,6 @@ export default function Index() {
           <div style={{ fontFamily: 'Share Tech Mono', fontSize: '8px', color: '#2a2a2a', letterSpacing: '0.25em', marginBottom: 10 }}>
             ► ПАРАМЕТРЫ ФИЛЬТРАЦИИ
           </div>
-
           <div style={{ position: 'relative', marginBottom: 10 }}>
             <input
               type="text"
@@ -452,7 +547,6 @@ export default function Index() {
             />
             <Icon name="Search" size={11} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#2a2a2a' }} />
           </div>
-
           <div className="flex flex-wrap gap-2 mb-2">
             <span style={{ fontFamily: 'Share Tech Mono', fontSize: '8px', color: '#2a2a2a', letterSpacing: '0.15em', alignSelf: 'center', minWidth: 56 }}>РЕГИОН:</span>
             {REGIONS.map(r => (
@@ -482,30 +576,29 @@ export default function Index() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1px', background: '#111' }}>
             {filtered.map((item, idx) => {
               const isHovered = hoveredId === item.id;
-              const severityColor = SEVERITY_COLORS[item.severity] || '#888';
+              const sc = SEVERITY_COLORS[item.severity] || '#888';
               return (
                 <div
                   key={item.id}
-                  onMouseEnter={() => { setHoveredId(item.id); mia.speak(item.miaVoice); }}
-                  onMouseLeave={() => { setHoveredId(null); mia.stop(); }}
+                  onMouseEnter={() => setHoveredId(item.id)}
+                  onMouseLeave={() => setHoveredId(null)}
                   className="animate-fade-in-up"
                   style={{
                     background: isHovered ? 'rgba(12,0,0,0.98)' : '#090909',
-                    border: `1px solid ${isHovered ? severityColor + '55' : '#111'}`,
+                    border: `1px solid ${isHovered ? sc + '55' : '#111'}`,
                     padding: '18px',
                     position: 'relative',
                     transition: 'all 0.2s ease',
                     cursor: 'pointer',
-                    boxShadow: isHovered ? `0 0 24px ${severityColor}18, inset 0 0 24px ${severityColor}05` : 'none',
-                    animationDelay: `${idx * 0.05}s`,
+                    boxShadow: isHovered ? `0 0 24px ${sc}18, inset 0 0 24px ${sc}05` : 'none',
+                    animationDelay: `${idx * 0.04}s`,
                     animationFillMode: 'both',
                     opacity: 0,
                   }}
                 >
-                  {/* Верхняя полоска */}
                   <div style={{
                     position: 'absolute', top: 0, left: 0, width: '100%', height: '2px',
-                    background: `linear-gradient(to right, ${severityColor}, transparent)`,
+                    background: `linear-gradient(to right, ${sc}, transparent)`,
                     opacity: isHovered ? 0.8 : 0.3,
                     transition: 'opacity 0.2s',
                   }} />
@@ -515,9 +608,9 @@ export default function Index() {
                       <span style={{
                         fontFamily: 'Share Tech Mono', fontSize: '8px', letterSpacing: '0.15em',
                         padding: '2px 7px',
-                        border: `1px solid ${severityColor}33`,
-                        color: severityColor,
-                        background: `${severityColor}0d`,
+                        border: `1px solid ${sc}33`,
+                        color: sc,
+                        background: `${sc}0d`,
                       }}>
                         {item.severity}
                       </span>
@@ -527,7 +620,7 @@ export default function Index() {
                         </span>
                       )}
                     </div>
-                    <Icon name="AlertTriangle" size={11} style={{ color: severityColor, opacity: isHovered ? 0.8 : 0.3, transition: 'opacity 0.2s' }} />
+                    <Icon name="AlertTriangle" size={11} style={{ color: sc, opacity: isHovered ? 0.8 : 0.3, transition: 'opacity 0.2s' }} />
                   </div>
 
                   <div style={{ fontFamily: 'Share Tech Mono', fontSize: '8px', color: '#2a2a2a', letterSpacing: '0.2em', marginBottom: 6 }}>
@@ -553,12 +646,11 @@ export default function Index() {
                     </div>
                     {item.casualties > 0 && (
                       <div style={{ fontFamily: 'Orbitron, monospace', fontSize: '11px', color: '#ff0033', fontWeight: 700 }}>
-                        ☠ {item.casualties}
+                        ☠ {item.casualties.toLocaleString('ru-RU')}
                       </div>
                     )}
                   </div>
 
-                  {/* Tooltip Мии */}
                   <MiaTooltip text={item.miaVoice} visible={isHovered} />
                 </div>
               );
