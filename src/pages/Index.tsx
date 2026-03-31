@@ -2,6 +2,206 @@ import { useState, useEffect, useRef } from 'react';
 import Icon from '@/components/ui/icon';
 import { useHorrorAudio } from '@/hooks/useHorrorAudio';
 
+// ─── TICKER ───────────────────────────────────────────────
+const TICKER_ITEMS = [
+  '⚠ ЭКСТРЕННО: Взрыв в районе аэропорта Карачи — подробности уточняются',
+  '☠ ПОДТВЕРЖДЕНО: Число жертв в Багдаде выросло до 71',
+  '⚡ ПЕРЕХВАТ: Неизвестная группировка взяла на себя ответственность за атаку в Найроби',
+  '⚠ МИЯ ГАУСС: Получен новый зашифрованный пакет данных из Европы',
+  '☠ СРОЧНО: Спецслужбы трёх стран объявили режим повышенной готовности',
+  '⚡ УТЕЧКА: Документы о финансировании теракта в Вене переданы в редакцию',
+  '⚠ ОБНОВЛЕНИЕ: Тихий переворот в структуре одной из спящих ячеек — подробности засекречены',
+  '☠ АРХИВ ОБНОВЛЁН: Добавлено 3 новых инцидента за последние 48 часов',
+  '⚡ СИГНАЛ: Неопознанный источник передал координаты следующей цели — проверка продолжается',
+  '⚠ МИЯ ГАУСС: Я знаю больше, чем написано здесь. Не всё можно публиковать.',
+];
+
+function NewsTicker() {
+  const [offset, setOffset] = useState(0);
+  const text = TICKER_ITEMS.join('   ///   ');
+  const rafRef = useRef<number>(0);
+  const lastRef = useRef<number>(0);
+  const speedRef = useRef(0.6);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const totalWidth = useRef(0);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    totalWidth.current = el.scrollWidth / 2;
+    const animate = (ts: number) => {
+      if (lastRef.current) {
+        const delta = ts - lastRef.current;
+        setOffset(prev => {
+          const next = prev + speedRef.current * (delta / 16);
+          return next >= totalWidth.current ? 0 : next;
+        });
+      }
+      lastRef.current = ts;
+      rafRef.current = requestAnimationFrame(animate);
+    };
+    rafRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  const repeated = text + '   ///   ' + text;
+
+  return (
+    <div style={{
+      position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 9990,
+      background: 'rgba(4,0,0,0.97)',
+      borderTop: '1px solid rgba(255,0,51,0.3)',
+      height: 28, overflow: 'hidden',
+      display: 'flex', alignItems: 'center',
+    }}>
+      <div style={{
+        background: '#ff0033', color: '#000', fontFamily: 'Orbitron, monospace',
+        fontSize: '8px', fontWeight: 700, letterSpacing: '0.2em',
+        padding: '0 12px', height: '100%', display: 'flex', alignItems: 'center',
+        flexShrink: 0, whiteSpace: 'nowrap',
+        boxShadow: '4px 0 12px rgba(255,0,51,0.5)',
+      }}>
+        LIVE
+      </div>
+      <div style={{ overflow: 'hidden', flex: 1, height: '100%', position: 'relative' }}>
+        <div
+          ref={containerRef}
+          style={{
+            position: 'absolute', top: 0, left: 0, height: '100%',
+            display: 'flex', alignItems: 'center',
+            transform: `translateX(-${offset}px)`,
+            whiteSpace: 'nowrap',
+            fontFamily: 'Share Tech Mono, monospace',
+            fontSize: '10px', color: '#888', letterSpacing: '0.08em',
+          }}
+        >
+          {repeated}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── WORLD MAP ─────────────────────────────────────────────
+const MAP_INCIDENTS = [
+  { id: 1,  x: 51,  y: 32, label: 'ВЕНА',        severity: 'КРИТИЧНО' },
+  { id: 2,  x: 86,  y: 30, label: 'ТОКИО',       severity: 'ВЫСОКИЙ'  },
+  { id: 3,  x: 22,  y: 28, label: 'НЬЮ-ЙОРК',   severity: 'ВЫСОКИЙ'  },
+  { id: 4,  x: 60,  y: 42, label: 'БАГДАД',      severity: 'КРИТИЧНО' },
+  { id: 5,  x: 57,  y: 24, label: 'МОСКВА',      severity: 'КРИТИЧНО' },
+  { id: 6,  x: 59,  y: 45, label: 'КЕРМАН',      severity: 'КРИТИЧНО' },
+  { id: 7,  x: 65,  y: 48, label: 'КАБУЛ',       severity: 'КРИТИЧНО' },
+  { id: 8,  x: 59,  y: 40, label: 'ИЗРАИЛЬ',     severity: 'КРИТИЧНО' },
+  { id: 9,  x: 56,  y: 27, label: 'СЕВАСТОПОЛЬ', severity: 'КРИТИЧНО' },
+  { id: 10, x: 63,  y: 60, label: 'НАЙРОБИ',     severity: 'СРЕДНИЙ'  },
+  { id: 11, x: 23,  y: 35, label: 'НЭШВИЛЛ',    severity: 'КРИТИЧНО' },
+  { id: 12, x: 24,  y: 35, label: 'БОСТОН',      severity: 'СРЕДНИЙ'  },
+  { id: 13, x: 49,  y: 30, label: 'ПАРИЖ',       severity: 'ВЫСОКИЙ'  },
+  { id: 14, x: 21,  y: 55, label: 'МЕХИКО',      severity: 'СРЕДНИЙ'  },
+  { id: 15, x: 57,  y: 26, label: 'ДАГЕСТАН',    severity: 'КРИТИЧНО' },
+];
+
+const DOT_COLORS: Record<string, string> = {
+  КРИТИЧНО: '#ff0033',
+  ВЫСОКИЙ: '#ff6600',
+  СРЕДНИЙ: '#ffaa00',
+};
+
+function WorldMap() {
+  const [hovered, setHovered] = useState<number | null>(null);
+
+  return (
+    <div style={{
+      position: 'relative',
+      background: 'rgba(4,0,0,0.85)',
+      border: '1px solid #111',
+      padding: '20px',
+      marginBottom: 0,
+    }}>
+      <div style={{ fontFamily: 'Share Tech Mono', fontSize: '8px', color: '#2a2a2a', letterSpacing: '0.3em', marginBottom: 12 }}>
+        ► КАРТА ИНЦИДЕНТОВ // ГЛОБАЛЬНЫЙ ОХВАТ
+      </div>
+
+      <div style={{ position: 'relative', width: '100%', paddingBottom: '42%' }}>
+        {/* SVG карта мира (упрощённые контуры) */}
+        <svg
+          viewBox="0 0 100 50"
+          style={{
+            position: 'absolute', inset: 0, width: '100%', height: '100%',
+          }}
+          preserveAspectRatio="xMidYMid meet"
+        >
+          {/* Сетка */}
+          {[10,20,30,40,50,60,70,80,90].map(x => (
+            <line key={`vl${x}`} x1={x} y1="0" x2={x} y2="50" stroke="rgba(255,0,51,0.04)" strokeWidth="0.2" />
+          ))}
+          {[10,20,30,40].map(y => (
+            <line key={`hl${y}`} x1="0" y1={y} x2="100" y2={y} stroke="rgba(255,0,51,0.04)" strokeWidth="0.2" />
+          ))}
+
+          {/* Контуры материков — упрощённые */}
+          {/* Северная Америка */}
+          <path d="M5,10 L22,8 L28,14 L25,22 L20,28 L18,35 L15,38 L12,36 L10,30 L8,24 L5,18 Z" fill="rgba(30,30,30,0.8)" stroke="rgba(255,0,51,0.15)" strokeWidth="0.3" />
+          {/* Южная Америка */}
+          <path d="M20,38 L28,36 L32,42 L30,52 L26,54 L22,50 L19,44 Z" fill="rgba(30,30,30,0.8)" stroke="rgba(255,0,51,0.15)" strokeWidth="0.3" />
+          {/* Европа */}
+          <path d="M42,10 L52,8 L56,12 L54,18 L50,20 L46,18 L44,14 Z" fill="rgba(30,30,30,0.8)" stroke="rgba(255,0,51,0.15)" strokeWidth="0.3" />
+          {/* Африка */}
+          <path d="M44,22 L56,20 L60,28 L62,36 L60,44 L56,48 L50,46 L46,40 L44,32 Z" fill="rgba(30,30,30,0.8)" stroke="rgba(255,0,51,0.15)" strokeWidth="0.3" />
+          {/* Азия */}
+          <path d="M54,8 L88,6 L92,14 L90,22 L82,26 L70,28 L62,24 L58,18 L54,14 Z" fill="rgba(30,30,30,0.8)" stroke="rgba(255,0,51,0.15)" strokeWidth="0.3" />
+          {/* Австралия */}
+          <path d="M78,36 L88,34 L92,38 L90,44 L84,46 L80,44 L78,40 Z" fill="rgba(30,30,30,0.8)" stroke="rgba(255,0,51,0.15)" strokeWidth="0.3" />
+
+          {/* Точки инцидентов */}
+          {MAP_INCIDENTS.map(inc => {
+            const color = DOT_COLORS[inc.severity];
+            const isH = hovered === inc.id;
+            return (
+              <g key={inc.id} style={{ cursor: 'pointer' }}
+                onMouseEnter={() => setHovered(inc.id)}
+                onMouseLeave={() => setHovered(null)}
+              >
+                {/* Пульсирующий круг */}
+                <circle cx={inc.x} cy={inc.y} r={isH ? 2.2 : 1.4}
+                  fill={color} opacity={isH ? 1 : 0.8}
+                  style={{ filter: `drop-shadow(0 0 2px ${color})`, transition: 'r 0.15s' }}
+                />
+                <circle cx={inc.x} cy={inc.y} r={isH ? 3.5 : 2}
+                  fill="none" stroke={color} strokeWidth="0.3" opacity={isH ? 0.6 : 0.2}
+                />
+                {/* Подпись при наведении */}
+                {isH && (
+                  <text x={inc.x + 2} y={inc.y - 2}
+                    fill={color} fontSize="2.2"
+                    fontFamily="Share Tech Mono, monospace"
+                    style={{ filter: `drop-shadow(0 0 2px ${color})` }}
+                  >
+                    {inc.label}
+                  </text>
+                )}
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+
+      {/* Легенда */}
+      <div style={{ display: 'flex', gap: 16, marginTop: 10 }}>
+        {Object.entries(DOT_COLORS).map(([label, color]) => (
+          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: color, boxShadow: `0 0 6px ${color}` }} />
+            <span style={{ fontFamily: 'Share Tech Mono', fontSize: '8px', color: '#333', letterSpacing: '0.1em' }}>{label}</span>
+          </div>
+        ))}
+        <div style={{ marginLeft: 'auto', fontFamily: 'Share Tech Mono', fontSize: '8px', color: '#222', letterSpacing: '0.1em' }}>
+          {MAP_INCIDENTS.length} ТОЧЕК · {MAP_INCIDENTS.filter(i => i.severity === 'КРИТИЧНО').length} КРИТИЧНЫХ
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const ARCHIVE_DATA = [
   {
     id: 1,
@@ -436,7 +636,7 @@ export default function Index() {
   }
 
   return (
-    <div className="min-h-screen relative" style={{ background: '#080808' }}>
+    <div className="min-h-screen relative" style={{ background: '#080808', paddingBottom: 28 }}>
       <div className="scanline" />
       <div className="noise-overlay" />
       <MatrixRain />
@@ -523,6 +723,7 @@ export default function Index() {
                 position: 'relative',
                 zIndex: 3,
                 display: 'block',
+                animation: 'miaIdle 3.5s ease-in-out infinite',
               }}
             />
           </div>
@@ -623,6 +824,11 @@ export default function Index() {
           </div>
         </div>
 
+        {/* WORLD MAP */}
+        <div className="mb-6">
+          <WorldMap />
+        </div>
+
         {/* GRID */}
         {filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0', fontFamily: 'Share Tech Mono', fontSize: '11px', color: '#1e1e1e', letterSpacing: '0.2em' }}>
@@ -714,6 +920,8 @@ export default function Index() {
           </div>
         )}
       </div>
+
+      <NewsTicker />
 
       {/* FOOTER */}
       <footer className="relative z-20 mt-12 border-t" style={{ borderColor: '#0d0d0d', background: 'rgba(4,0,0,0.95)', padding: '16px 24px' }}>
