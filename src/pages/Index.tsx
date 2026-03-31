@@ -1,5 +1,37 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Icon from '@/components/ui/icon';
+import { useHorrorAudio } from '@/hooks/useHorrorAudio';
+
+function useMiaVoice() {
+  const speakRef = useRef<SpeechSynthesisUtterance | null>(null);
+
+  const speak = (text: string) => {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'ru-RU';
+    utter.rate = 0.82;
+    utter.pitch = 1.35;
+    utter.volume = 0.9;
+
+    // Подбираем женский голос
+    const voices = window.speechSynthesis.getVoices();
+    const femaleRu = voices.find(v =>
+      v.lang.startsWith('ru') && (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('женский') || v.name.includes('Milena') || v.name.includes('Irina') || v.name.includes('Anna') || v.name.includes('Victoria') || v.name.includes('Oksana'))
+    ) || voices.find(v => v.lang.startsWith('ru')) || null;
+
+    if (femaleRu) utter.voice = femaleRu;
+    speakRef.current = utter;
+    window.speechSynthesis.speak(utter);
+  };
+
+  const stop = () => {
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+  };
+
+  useEffect(() => () => { stop(); }, []);
+  return { speak, stop };
+}
 
 const ARCHIVE_DATA = [
   {
@@ -240,6 +272,8 @@ export default function Index() {
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const [booted, setBooted] = useState(false);
   const [bootText, setBootText] = useState('');
+  useHorrorAudio();
+  const mia = useMiaVoice();
 
   const bootLines = [
     '> ИНИЦИАЛИЗАЦИЯ MIA_GAUSS.EXE...',
@@ -452,8 +486,8 @@ export default function Index() {
               return (
                 <div
                   key={item.id}
-                  onMouseEnter={() => setHoveredId(item.id)}
-                  onMouseLeave={() => setHoveredId(null)}
+                  onMouseEnter={() => { setHoveredId(item.id); mia.speak(item.miaVoice); }}
+                  onMouseLeave={() => { setHoveredId(null); mia.stop(); }}
                   className="animate-fade-in-up"
                   style={{
                     background: isHovered ? 'rgba(12,0,0,0.98)' : '#090909',
